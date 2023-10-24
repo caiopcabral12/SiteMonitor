@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -40,7 +43,6 @@ func ExecComand() int {
 }
 
 func main() {
-	openSite()
 	Intro()
 	for {
 		Comands()
@@ -48,7 +50,7 @@ func main() {
 
 		switch comand {
 		case 1:
-			Start()
+			openSite()
 		case 2:
 			Logs()
 		case 3:
@@ -57,40 +59,6 @@ func main() {
 			fmt.Printf("Unknown command! Choose a number between 1 and 3")
 		}
 	}
-}
-
-func Start() {
-	fmt.Println("Sites available:")
-	fmt.Println("")
-	sites := []string{"https://random-status-code.herokuapp.com/", "https://google.com"}
-	sites = append(sites, "Test them all!")
-
-	for i, site := range sites {
-		fmt.Println("- Site", i+1, ":", site)
-	}
-	fmt.Println("")
-	fmt.Println("What site do you want?")
-
-	var option int
-	fmt.Scan(&option)
-
-	if option < 1 || option > len(sites) {
-		fmt.Println("Bad request! Choose a number between 1 and", len(sites))
-		fmt.Println("")
-
-		return
-	}
-
-	for {
-		if sites[option-1] == "Test them all!" {
-			TestAllSites(sites)
-		} else {
-			TestSite(sites[option-1])
-		}
-		time.Sleep(timeUpload * time.Second)
-		fmt.Println("")
-	}
-
 }
 
 func Logs() {
@@ -102,22 +70,22 @@ func Quit() {
 	os.Exit(0)
 }
 
-func TestSite(site string) {
-	resp, err := http.Get(site)
+func TestSite(lines string) {
+	resp, err := http.Get(lines)
 
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 
 	if resp.StatusCode == 200 {
-		fmt.Println("The website:", site, "is working perfectly!")
+		fmt.Println("The website:", lines, "is working perfectly!")
 	} else {
-		fmt.Println("The website:", site, "is Offline  :( - ERROR", resp.StatusCode)
+		fmt.Println("The website:", lines, "is Offline  :( - ERROR", resp.StatusCode)
 	}
 }
 
-func TestAllSites(sites []string) {
-	for i, site := range sites {
+func TestAllSites(lines []string) {
+	for i, site := range lines {
 
 		if site != "Test them all!" {
 			fmt.Printf("Testing site %d: %s\n", i+1, site)
@@ -128,12 +96,57 @@ func TestAllSites(sites []string) {
 	fmt.Println("All sites tested.")
 }
 
-func openSite() {
-	links, err := os.Open("sites.txt")
+func openSite() []string {
 
+	fmt.Println("Sites available:")
+	fmt.Println("")
+
+	var lines []string
+
+	data, err := os.Open("sites.txt")
 	if err != nil {
-		fmt.Println("Erorr:", err)
-	} else {
-		fmt.Println(links)
+		fmt.Println("Error:", err)
 	}
+
+	reader := bufio.NewReader(data)
+
+	for {
+		line, err := reader.ReadString('\n')
+		line = strings.TrimSpace(line)
+
+		lines = append(lines, line)
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	data.Close()
+
+	for i, site := range lines {
+		fmt.Println("- Option", i+1, ":", site)
+	}
+
+	fmt.Println("")
+	fmt.Println("What site do you want?")
+
+	var option int
+	fmt.Scan(&option)
+
+	if option < 1 || option > len(lines) {
+		fmt.Println("Bad request! Choose a number between 1 and", len(lines))
+		fmt.Println("")
+
+	}
+
+	for {
+		if lines[option-1] == "Test them all!" {
+			TestAllSites(lines)
+		} else {
+			TestSite(lines[option-1])
+		}
+		time.Sleep(timeUpload * time.Second)
+		fmt.Println("")
+	}
+
 }
