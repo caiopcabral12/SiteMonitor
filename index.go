@@ -43,6 +43,7 @@ func ExecComand() int {
 }
 
 func main() {
+
 	Intro()
 	for {
 		Comands()
@@ -52,22 +53,15 @@ func main() {
 		case 1:
 			openSite()
 		case 2:
-			Logs()
+			fmt.Println("Sites logs bitch")
+			writeLog("")
 		case 3:
-			Quit()
+			fmt.Println("See you soon!  :)")
+			os.Exit(0)
 		default:
 			fmt.Printf("Unknown command! Choose a number between 1 and 3")
 		}
 	}
-}
-
-func Logs() {
-	fmt.Println("Sites logs bitch")
-}
-
-func Quit() {
-	fmt.Println("See you soon!")
-	os.Exit(0)
 }
 
 func TestSite(lines string) {
@@ -79,8 +73,10 @@ func TestSite(lines string) {
 
 	if resp.StatusCode == 200 {
 		fmt.Println("The website:", lines, "is working perfectly!")
+		registerLog(lines, true)
 	} else {
 		fmt.Println("The website:", lines, "is Offline  :( - ERROR", resp.StatusCode)
+		registerLog(lines, false)
 	}
 }
 
@@ -148,5 +144,30 @@ func openSite() []string {
 		time.Sleep(timeUpload * time.Second)
 		fmt.Println("")
 	}
+}
 
+func registerLog(lines string, status bool) {
+	logs, err := os.OpenFile("logs.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+
+	date := time.Now()
+
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+
+	if status == true {
+		logs.WriteString("- " + date.Format(string("02/01/2006 03:04:05")) + " - Website online: " + lines + "\n")
+	} else {
+		logs.WriteString("- " + date.Format(string("02/01/2006 03:04:05")) + " - Website offline: " + lines + "\n")
+	}
+
+	logs.Close()
+}
+
+func writeLog(logs string) {
+	log, err := os.ReadFile("logs.txt")
+	if err != nil {
+		fmt.Println("Error:", err)
+	}
+	fmt.Println(string(log))
 }

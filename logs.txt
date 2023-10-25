@@ -1,0 +1,9 @@
+- 25/10/2023 10:17:44 - Website was offline: https://random-status-code.herokuapp.com
+- 25/10/2023 10:17:44 - Website was online: https://google.com
+- 25/10/2023 10:17:50 - Website was offline: https://random-status-code.herokuapp.com
+- 25/10/2023 10:17:50 - Website was online: https://google.com
+- 25/10/2023 10:17:56 - Website was offline: https://random-status-code.herokuapp.com
+- 25/10/2023 10:17:56 - Website was online: https://google.com
+- 25/10/2023 10:28:47 - Website offline: https://random-status-code.herokuapp.com
+- 25/10/2023 10:28:47 - Website online: https://google.com
+- 25/10/2023 10:43:52 - Website offline: https://random-status-code.herokuapp.com
